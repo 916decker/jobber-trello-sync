@@ -172,7 +172,37 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.send('Jobber-Trello Sync Server is running! Use /test to test the integration.');
 });
+// Jobber OAuth endpoint
+app.get('/jobber-auth', async (req, res) => {
+  try {
+    const clientId = process.env.JOBBER_CLIENT_ID;
+    const clientSecret = process.env.JOBBER_CLIENT_SECRET;
+    
+    if (!clientId || !clientSecret) {
+      return res.status(400).send('Missing Jobber credentials in environment variables');
+    }
+    
+    res.send(`
+      <h2>Jobber OAuth Setup</h2>
+      <p>Client ID: ${clientId}</p>
+      <p>Next: We'll get your access token to set up webhooks</p>
+      <a href="https://api.getjobber.com/api/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=https://jobber-trello-sync.onrender.com/oauth-callback">
+        Click here to authorize with Jobber
+      </a>
+    `);
+  } catch (error) {
+    res.status(500).send('Error: ' + error.message);
+  }
+});
 
+app.get('/oauth-callback', (req, res) => {
+  const code = req.query.code;
+  if (code) {
+    res.send(`Authorization code received: ${code}. Check server logs for access token.`);
+  } else {
+    res.send('Authorization failed');
+  }
+});
 const PORT = process.env.PORT || 10000;
 // Jobber OAuth endpoint
 app.get('/jobber-auth', async (req, res) => {
