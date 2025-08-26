@@ -127,7 +127,7 @@ app.post('/webhook/jobber', async (req, res) => {
 });
 
 // Test endpoint
-app.post('/test', async (req, res) => {
+app.get('/test', async (req, res) => {
   console.log('=== Testing Webhook ===');
   
   const testData = {
