@@ -186,8 +186,7 @@ app.get('/jobber-auth', async (req, res) => {
       <h2>Jobber OAuth Setup</h2>
       <p>Client ID: ${clientId}</p>
       <p>Next: We'll get your access token to set up webhooks</p>
-      <a href="https://api.getjobber.com/api/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=https://jobber-trello-sync.onrender.com/oauth-callback">
-        Click here to authorize with Jobber
+<a href="https://api.getjobber.com/api/oauth/authorize?client_id=${clientId}&response_type=code&scope=read_client,read_job,read_quote,webhook&redirect_uri=https://jobber-trello-sync.onrender.com/oauth-callback">        Click here to authorize with Jobber
       </a>
     `);
   } catch (error) {
