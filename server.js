@@ -195,12 +195,37 @@ app.get('/jobber-auth', async (req, res) => {
   }
 });
 
-app.get('/oauth-callback', (req, res) => {
+app.get('/oauth-callback', async (req, res) => {
   const code = req.query.code;
-  if (code) {
-    res.send(`Authorization code received: ${code}. Check server logs for access token.`);
-  } else {
-    res.send('Authorization failed');
+  if (!code) {
+    return res.send('Authorization failed - no code received');
+  }
+
+  try {
+    // Exchange authorization code for access token
+    const tokenResponse = await axios.post('https://api.getjobber.com/api/oauth/token', {
+      client_id: process.env.JOBBER_CLIENT_ID,
+      client_secret: process.env.JOBBER_CLIENT_SECRET,
+      code: code,
+      grant_type: 'authorization_code',
+      redirect_uri: 'https://jobber-trello-sync.onrender.com/oauth-callback'
+    });
+
+    const accessToken = tokenResponse.data.access_token;
+    console.log('🎉 Access Token received:', accessToken);
+
+    // Store token (in a real app, save this securely)
+    process.env.JOBBER_ACCESS_TOKEN = accessToken;
+
+    res.send(`
+      <h2>✅ Jobber Connected Successfully!</h2>
+      <p>Access token received and stored.</p>
+      <p><a href="/setup-webhook">Click here to set up webhook</a></p>
+    `);
+
+  } catch (error) {
+    console.error('Token exchange error:', error.response?.data || error.message);
+    res.send(`Error getting access token: ${error.message}`);
   }
 });
 const PORT = process.env.PORT || 10000;
