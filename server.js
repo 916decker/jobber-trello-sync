@@ -26,6 +26,10 @@ const trelloAPI = {
 
       const cards = response.data;
       console.log(`Found ${cards.length} cards on board`);
+      for (const card of cards) {
+  console.log(`Card: ${card.name}`);
+  console.log(`Custom fields:`, card.customFieldItems);
+}
       
       for (const card of cards) {
         if (card.customFieldItems) {
