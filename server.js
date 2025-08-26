@@ -17,12 +17,12 @@ const trelloAPI = {
       console.log(`Looking for card with Deal ID: ${dealId}`);
       
       const response = await axios.get(`https://api.trello.com/1/boards/${TRELLO_BOARD_ID}/cards`, {
-        params: {
-          key: TRELLO_API_KEY,
-          token: TRELLO_TOKEN,
-          customFields: 'true'
-        }
-      });
+  params: {
+    key: TRELLO_API_KEY,
+    token: TRELLO_TOKEN,
+    customFieldItems: 'true'
+  }
+});
 
       const cards = response.data;
       console.log(`Found ${cards.length} cards on board`);
