@@ -210,7 +210,45 @@ app.get('/oauth-callback', async (req, res) => {
       grant_type: 'authorization_code',
       redirect_uri: 'https://jobber-trello-sync.onrender.com/oauth-callback'
     });
+app.get('/setup-webhook', async (req, res) => {
+  try {
+    const accessToken = process.env.JOBBER_ACCESS_TOKEN;
+    
+    if (!accessToken) {
+      return res.send('No access token found. <a href="/jobber-auth">Reauthorize with Jobber</a>');
+    }
 
+    // Create webhook subscription
+    const webhookResponse = await axios.post('https://api.getjobber.com/api/webhooks', {
+      url: 'https://jobber-trello-sync.onrender.com/webhook/jobber',
+      event_types: ['quote.updated', 'job.updated']
+    }, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'X-API-VERSION': '2023-03-01',
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('✅ Webhook created:', webhookResponse.data);
+
+    res.send(`
+      <h2>🎉 Webhook Setup Complete!</h2>
+      <p>Jobber will now send updates to your server when quotes or jobs are updated.</p>
+      <p><strong>Webhook URL:</strong> https://jobber-trello-sync.onrender.com/webhook/jobber</p>
+      <p><strong>Events:</strong> quote.updated, job.updated</p>
+      <p><a href="/test">Test the integration</a></p>
+    `);
+
+  } catch (error) {
+    console.error('Webhook setup error:', error.response?.data || error.message);
+    res.send(`
+      <h2>❌ Webhook Setup Failed</h2>
+      <p>Error: ${error.message}</p>
+      <p><a href="/jobber-auth">Try reauthorizing</a></p>
+    `);
+  }
+});
     const accessToken = tokenResponse.data.access_token;
     console.log('🎉 Access Token received:', accessToken);
 
